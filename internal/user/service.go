@@ -25,6 +25,7 @@ type User struct {
 }
 
 func (s *service) AddUser(u User) (string, error) {
+	// SMELL: direct connection to DB, consider ORM
 	db, err := sql.Open("postgres", "postgres://admin:admin@localhost/test_repo?sslmode=disable")
 	if err != nil {
 		panic(err)
@@ -32,6 +33,9 @@ func (s *service) AddUser(u User) (string, error) {
 	defer db.Close()
 
 	var id string
+	// SMELL: direct SQL, consider ORM CRUD
+	// SMELL: password string is saved directly, consider encryption
+	// SMELL: in 000001_create_users_table.up.sql username should be made unique and validated
 	q := "INSERT INTO users (username, password) VALUES ('" + u.Name + "', '" + u.Password + "') RETURNING id"
 
 	err = db.QueryRow(q).Scan(&id)

@@ -16,7 +16,7 @@ import (
 func main() {
 
 	runMigrations()
-
+	// SMELL: risk exposing DB credentials, consider env vars
 	svc, err := user.NewService("admin", "admin")
 	if err != nil {
 		log.Fatal(err)
@@ -27,11 +27,14 @@ func main() {
 	http.HandleFunc("/user", h.AddUser)
 
 	log.Println("starting http server")
+	// SMELL: ports can change with env, use env vars
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
+// SMELL: use a dedicated Migrator e.g. GORM migrator
 func runMigrations() {
 	// Database connection string
+	// SMELL: should be an env var, changes with envronment
 	dbURL := "postgres://admin:admin@localhost/test_repo?sslmode=disable"
 
 	db, err := sql.Open("postgres", dbURL)
