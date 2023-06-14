@@ -9,6 +9,18 @@ type Handler struct {
 	Svc service
 }
 
+type UserCreationSuccessResponse struct {
+  Code int `json:"code"`
+  Message string `json:"message"`
+  UserId string `json:"userId"`
+}
+
+type UserCreationFailedResponse struct {
+  Code int `json:"code"`
+  Message string `json:"message"`
+  Reason string `json:"reason"`
+}
+
 func (h Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
