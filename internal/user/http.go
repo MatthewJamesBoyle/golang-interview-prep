@@ -42,6 +42,13 @@ func (h Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Return a success response
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(message))
+  response := UserCreationSuccessResponse{
+    Code: http.StatusCreated, 
+    Message: "New user has been created", 
+    UserId: message,
+  }
+	w.WriteHeader(response.Code)
+  w.Header().Add("Content-Type", "application/json")
+  bytes, _ := json.Marshal(response)
+	w.Write(bytes)
 }
