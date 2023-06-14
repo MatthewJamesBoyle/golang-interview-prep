@@ -30,15 +30,29 @@ func (h Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 	var u User
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Invalid request body"))
+    response := UserCreationFailedResponse{
+      Code: http.StatusBadRequest,
+      Message: "Failed to create user",
+      Reason: "Invalid request body",
+    }
+		w.WriteHeader(response.Code)
+    w.Header().Add("Content-Type", "application/json")
+    bytes, _ := json.Marshal(response)
+		w.Write(bytes)
 		return
 	}
 	// Call the AddUser function
 	message, err := h.Svc.AddUser(u)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Failed to add user"))
+    response := UserCreationFailedResponse{
+      Code: http.StatusInternalServerError,
+      Message: "Failed to create user",
+      Reason: "Failed to add user", // Thank you, captain obvious! :)
+    }
+    w.WriteHeader(response.Code)
+    w.Header().Add("Content-Type", "application/json")
+    bytes, _ := json.Marshal(response)
+		w.Write(bytes)
 	}
 
 	// Return a success response
