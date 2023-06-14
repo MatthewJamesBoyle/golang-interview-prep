@@ -10,13 +10,13 @@ type Handler struct {
 }
 
 type UserCreationSuccessResponse struct {
-  Code int `json:"code"`
+  Status string `json:"status"`
   Message string `json:"message"`
   UserId string `json:"userId"`
 }
 
 type UserCreationFailedResponse struct {
-  Code int `json:"code"`
+  Status string `json:"status"`
   Message string `json:"message"`
   Reason string `json:"reason"`
 }
@@ -31,11 +31,11 @@ func (h Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
     response := UserCreationFailedResponse{
-      Code: http.StatusBadRequest,
+      Status: "Failed",
       Message: "Failed to create user",
       Reason: "Invalid request body",
     }
-		w.WriteHeader(response.Code)
+		w.WriteHeader(http.StatusBadRequest)
     w.Header().Add("Content-Type", "application/json")
     bytes, _ := json.Marshal(response)
 		w.Write(bytes)
@@ -45,11 +45,11 @@ func (h Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 	message, err := h.Svc.AddUser(u)
 	if err != nil {
     response := UserCreationFailedResponse{
-      Code: http.StatusInternalServerError,
+      Status: "Failed",
       Message: "Failed to create user",
       Reason: "Failed to add user", // Thank you, captain obvious! :)
     }
-    w.WriteHeader(response.Code)
+    w.WriteHeader(http.StatusInternalServerError)
     w.Header().Add("Content-Type", "application/json")
     bytes, _ := json.Marshal(response)
 		w.Write(bytes)
@@ -57,11 +57,11 @@ func (h Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 
 	// Return a success response
   response := UserCreationSuccessResponse{
-    Code: http.StatusCreated, 
+    Status: "Success", 
     Message: "New user has been created", 
     UserId: message,
   }
-	w.WriteHeader(response.Code)
+	w.WriteHeader(http.StatusCreated)
   w.Header().Add("Content-Type", "application/json")
   bytes, _ := json.Marshal(response)
 	w.Write(bytes)
